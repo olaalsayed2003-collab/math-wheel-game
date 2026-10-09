@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>عجلة الحظ الرياضية - ضرب وقسمة الأعداد الصحيحة</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Strict Right-to-Left Math Expression Layout for Arabic Pedagogy */
+        .math-expr {
+            direction: rtl !important;
+            unicode-bidi: isolate !important;
+            display: inline-block;
+            font-family: 'Tajawal', monospace, sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .math-num {
+            direction: rtl !important;
+            unicode-bidi: isolate !important;
+            display: inline-block;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism effects */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Button Glow & Pulse Animation */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(14, 165, 233, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.8); }
+        }
+
+        .btn-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Wheel Pointer Arrow Shake */
+        @keyframes pointer-shake {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-10deg); }
+            75% { transform: translateX(-50%) rotate(10deg); }
+            100% { transform: translateX(-50%) rotate(0deg); }
+        }
+
+        .pointer-ticking {
+            animation: pointer-shake 0.15s infinite ease-in-out;
+        }
+
+        /* Modal transitions */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+        }
+        .modal-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Confetti Canvas Overlay */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Certificate Printable Area */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-certificate, #printable-certificate * {
+                visibility: visible;
+            }
+            #printable-certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col justify-between items-center p-2 sm:p-4 selection:bg-sky-500 selection:text-white">
+
+    <!-- Particle Canvas for Confetti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Top Header Navigation & Controls -->
+    <header class="w-full max-w-2xl flex justify-between items-center mb-3 px-2 py-2 glass-panel rounded-2xl shadow-lg border border-slate-700/50">
+        <div class="flex items-center space-x-2 space-x-reverse">
+            <span class="text-2xl">🎡</span>
+            <div class="leading-tight">
+                <h1 class="font-bold text-sm sm:text-base text-sky-400">عجلة الحظ الرياضية</h1>
+                <p class="text-[10px] sm:text-xs text-slate-300">أ. علا محسن السيد</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <!-- Audio Toggle Button -->
+            <button id="sound-btn" onclick="toggleSound()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 transition-all border border-slate-700 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow">
+                <i id="sound-icon" class="fas fa-volume-up text-amber-400"></i>
+                <span id="sound-text">الصوت</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SCREEN 1: Welcome & Student Name Input -->
+    <main id="screen-welcome" class="w-full max-w-md flex-1 flex flex-col justify-center items-center my-auto transition-all duration-500">
+        <div class="w-full glass-card p-6 sm:p-8 rounded-3xl text-center shadow-2xl border border-sky-500/20 relative overflow-hidden">
+            <!-- Decorative gradient orb -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-3xl flex items-center justify-center text-4xl shadow-lg transform hover:rotate-6 transition-transform">
+                📐
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">أهلاً بك يا بطل!</h2>
+            <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+                تحدي ضرب الأعداد الصحيحة وقسمتها<br>
+                <span class="text-sky-400 font-semibold">للصف السابع الأساسي</span>
+            </p>
+
+            <form onsubmit="startGame(event)" class="space-y-4">
+                <div class="text-right">
+                    <label for="student-name-input" class="block text-xs font-bold text-slate-300 mb-2 mr-1">
+                        اكتب اسمك الكريِم لبدء التحدي:
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="student-name-input" required placeholder="مثال: أحمد محمد" 
+                            class="w-full px-4 py-3.5 bg-slate-900/90 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors text-center text-lg font-bold shadow-inner">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">✏️</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-lg rounded-2xl shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 transition-all btn-glow flex items-center justify-center gap-2">
+                    <span>🚀 ابدأ التحدي</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-slate-700/50 text-slate-400 text-xs">
+                إعداد المعلمة: <span class="text-amber-400 font-bold">أ. علا محسن السيد</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCREEN 2: Main Game Dashboard & Wheel Area -->
+    <main id="screen-game" class="w-full max-w-xl flex-1 flex flex-col justify-start items-center hidden space-y-4 w-full">
+        
+        <!-- Scoreboard & Progress Header -->
+        <div class="w-full glass-card p-3 sm:p-4 rounded-2xl shadow-xl border border-slate-700 flex flex-col gap-2">
+            <div class="flex justify-between items-center text-xs sm:text-sm font-bold">
+                <div class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-amber-400">
+                    <span>🏆</span>
+                    <span>النقاط:</span>
+                    <span id="score-display" class="text-base text-white">٠</span>
+                </div>
+                
+                <div class="flex items-center gap-1 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-sky-400">
+                    <span id="student-greeting" class="text-slate-200">أهلاً بك</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-emerald-400">
+                    <span>📝</span>
+                    <span id="question-progress-text">السؤال ٠ من ٢٠</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Wheel Canvas & Pointer Container -->
+        <div class="relative w-full max-w-[340px] sm:max-w-[380px] aspect-square flex items-center justify-center py-2">
+            
+            <!-- Wheel Pointer / Arrow at Top -->
+            <div id="wheel-pointer" class="absolute top-0 left-1/2 -translate-x-1/2 z-20 w-8 h-10 sm:w-10 sm:h-12 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] pointer-events-none transition-transform duration-75">
+                <svg viewBox="0 0 40 50" class="w-full h-full">
+                    <path d="M 20 50 L 5 10 A 8 8 0 0 1 35 10 Z" fill="#EF4444" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="20" cy="15" r="5" fill="#FFFFFF"/>
+                </svg>
+            </div>
+
+            <!-- Outer Glow Frame -->
+            <div class="absolute inset-2 sm:inset-1 rounded-full bg-gradient-to-tr from-sky-500/30 via-indigo-500/20 to-amber-500/30 blur-md pointer-events-none"></div>
+
+            <!-- Wheel Canvas -->
+            <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full relative z-10 drop-shadow-2xl rounded-full cursor-pointer transition-transform"></canvas>
+            
+            <!-- Wheel Center Cap Button -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-b from-slate-800 to-slate-950 rounded-full border-4 border-amber-400 shadow-2xl flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-xl sm:text-2xl">⭐</span>
+                <span class="text-[9px] sm:text-[10px] font-black text-amber-400">رياضيات</span>
+            </div>
+        </div>
+
+        <!-- Spin Wheel Button -->
+        <div class="w-full flex justify-center pt-1">
+            <button id="spin-btn" onclick="spinWheel()" class="w-full max-w-xs py-4 px-8 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xl rounded-2xl shadow-xl transform hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3 border-2 border-amber-300 btn-glow">
+                <span class="text-2xl animate-spin">🎡</span>
+                <span>أدر العجلة</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- QUESTION MODAL DIALOG -->
+    <div id="question-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-300 opacity-0">
+        <div id="question-modal-card" class="w-full max-w-lg glass-card p-5 sm:p-7 rounded-3xl shadow-2xl border-2 border-sky-500/40 modal-enter flex flex-col space-y-5">
+            
+            <!-- Question Category Header Badge -->
+            <div class="flex justify-between items-center border-b border-slate-700/80 pb-3">
+                <div id="cat-badge" class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-black text-white flex items-center gap-2 shadow-md">
+                    <span id="cat-badge-icon">🔴</span>
+                    <span id="cat-badge-text">تحدي الضرب</span>
+                </div>
+
+                <div id="attempt-badge" class="text-xs font-bold px-3 py-1 bg-slate-800 text-slate-300 rounded-lg border border-slate-700">
+                    المحاولة الأولى (١٠ نقاط)
+                </div>
+            </div>
+
+            <!-- Question Text Box -->
+            <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-700 text-center flex flex-col justify-center items-center min-h-[120px] shadow-inner relative overflow-hidden">
+                <p id="question-instruction" class="text-xs text-slate-400 mb-2 font-medium">احسب الناتج الصحيح فيما يلي:</p>
+                <div id="question-text-container" class="text-xl sm:text-2xl md:text-3xl font-black text-white leading-relaxed my-auto">
+                    <!-- Mathematical question rendered here -->
+                </div>
+            </div>
+
+            <!-- Feedback Message Box (Success / Try Again) -->
+            <div id="feedback-box" class="hidden p-3 rounded-2xl text-center text-xs sm:text-sm font-bold transition-all"></div>
+
+            <!-- Input Form for Answer -->
+            <form onsubmit="submitAnswer(event)" class="space-y-4">
+                <div>
+                    <label for="answer-input" class="block text-xs font-bold text-slate-300 mb-2 text-right">
+                        إجابتك:
+                    </label>
+                    <input type="text" id="answer-input" required autocomplete="off" placeholder="اكتب الناتج هنا..." 
+                        class="w-full px-4 py-3.5 bg-slate-900 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors text-center text-xl sm:text-2xl font-bold dir-rtl shadow-inner">
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" id="submit-btn" class="flex-1 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>تحقق من الإجابة</span>
+                        <span>✅</span>
+                    </button>
+                    
+                    <button type="button" id="next-btn" onclick="closeQuestionModalAndContinue()" class="hidden flex-1 py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>المتابعة</span>
+                        <span>➡️</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SCREEN 3: Final Results & Certificate View -->
+    <main id="screen-result" class="w-full max-w-md flex-1 flex flex-col justify-center items-center hidden my-auto py-4">
+        <div class="w-full glass-card p-6 sm:p-8 rounded-3xl text-center shadow-2xl border border-amber-500/30 relative overflow-hidden space-y-5">
+            
+            <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-amber-400 to-yellow-600 rounded-3xl flex items-center justify-center text-4xl shadow-xl animate-bounce">
+                🏆
+            </div>
+
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">انتهى التحدي!</h2>
+                <p class="text-sm text-slate-300 mt-1">أحسنت يا بطل: <span id="res-student-name" class="text-amber-400 font-bold"></span></p>
+            </div>
+
+            <!-- Score Breakdown Card -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-700/80 space-y-2 text-xs sm:text-sm text-right">
+                <div class="flex justify-between items-center py-1 border-b border-slate-800">
+                    <span class="text-slate-400">مجموع النقاط النهائي:</span>
+                    <span id="res-total-score" class="font-black text-amber-400 text-lg">٠</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-800">
+                    <span class="text-slate-400">إجابات صحيحة (المحاولة الأولى):</span>
+                    <span id="res-first-try" class="font-bold text-emerald-400">٠</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-800">
+                    <span class="text-slate-400">إجابات صحيحة (المحاولة الثانية):</span>
+                    <span id="res-second-try" class="font-bold text-sky-400">٠</span>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-slate-400">إجمالي الأسئلة المُجابة:</span>
+                    <span id="res-total-questions" class="font-bold text-slate-200">٢٠ من ٢٠</span>
+                </div>
+            </div>
+
+            <!-- Performance Appraisal Message -->
+            <div id="res-appraisal" class="p-3 bg-sky-950/50 border border-sky-500/30 rounded-xl text-sky-300 text-xs sm:text-sm font-semibold">
+                🌟 أداء رائع جدًا! أثبتَّ أنك بطل في ضرب وقسمة الأعداد الصحيحة!
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2 pt-2">
+                <button onclick="showCertificateModal()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-black text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <span>🏆 عرض شهادة الإنجاز</span>
+                </button>
+
+                <button onclick="restartGame()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-base rounded-2xl border border-slate-700 shadow-md transition-all flex items-center justify-center gap-2">
+                    <span>🔄 العب مرة أخرى</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- CERTIFICATE MODAL SCREEN -->
+    <div id="certificate-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/90 backdrop-blur-md hidden transition-opacity duration-300 opacity-0 overflow-y-auto">
+        <div class="w-full max-w-2xl bg-white text-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl border-8 border-amber-400 relative my-auto my-8">
+            
+            <!-- Close Button -->
+            <button onclick="closeCertificateModal()" class="absolute top-4 left-4 w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg transition-colors print:hidden">
+                ✕
+            </button>
+
+            <!-- Certificate Frame Content -->
+            <div id="printable-certificate" class="text-center space-y-6 border-4 border-dashed border-amber-200 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-amber-50/50 to-white">
+                
+                <div class="flex justify-between items-center border-b-2 border-amber-300 pb-4">
+                    <div class="text-right">
+                        <p class="text-xs text-slate-500 font-bold">المملكة / المدرسة</p>
+                        <p class="text-sm font-black text-sky-800">مادة الرياضيات - الصف السابع</p>
+                    </div>
+                    <div class="text-4xl">🎓</div>
+                    <div class="text-left">
+                        <p class="text-xs text-slate-500 font-bold">المعلمة المشرفة</p>
+                        <p class="text-sm font-black text-amber-700">أ. علا محسن السيد</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 py-2">
+                    <h2 class="text-2xl sm:text-4xl font-black text-amber-600 tracking-wide">🏆 شهادة إنجاز واقتدار 🏆</h2>
+                    <p class="text-xs sm:text-sm text-slate-600 font-medium">تشهد معلمة المادة بأن الطالب البطل / الطالبة المبدعة:</p>
+                </div>
+
+                <div class="py-2">
+                    <span id="cert-student-name" class="text-2xl sm:text-3xl font-black text-sky-900 underline decoration-amber-400 decoration-4 underline-offset-8 px-4">
+                        اسم الطالب
+                    </span>
+                </div>
+
+                <p class="text-xs sm:text-base text-slate-700 leading-relaxed font-medium max-w-lg mx-auto">
+                    قد أتم بنجاح وتفوق جميع مهارات لعبة:<br>
+                    <strong class="text-amber-800 text-sm sm:text-lg">🎡 عجلة الحظ الرياضية - تحدي ضرب الأعداد الصحيحة وقسمتها</strong><br>
+                    وحصل على نتيجة متميزة بمجموع نقاط: <span id="cert-score" class="font-black text-sky-700 text-lg">٠</span>
+                </p>
+
+                <!-- Footer Signature Area -->
+                <div class="pt-6 border-t-2 border-amber-200 flex justify-between items-end text-xs sm:text-sm font-bold">
+                    <div class="text-right space-y-1">
+                        <p class="text-slate-500">التاريخ:</p>
+                        <p id="cert-date" class="text-slate-800">٢٠٢٦/١٠/٠٩</p>
+                    </div>
+
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-amber-400 flex items-center justify-center text-amber-500 font-black text-xs rotate-[-12deg] bg-amber-50/80 shadow-sm">
+                        <span>مُتفوق 🌟</span>
+                    </div>
+
+                    <div class="text-left space-y-1">
+                        <p class="text-slate-500">معلمة المادة:</p>
+                        <p class="text-sky-900 font-black">أ. علا محسن السيد</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Print / Save Button -->
+            <div class="mt-6 flex justify-center gap-3 print:hidden">
+                <button onclick="window.print()" class="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center gap-2">
+                    <span>🖨️ طباعة الشهادة / حفظ PDF</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-2 text-[11px] text-slate-300">
+        عجلة الحظ الرياضية للصف السابع | إعداد المعلمة: <span class="text-amber-400 font-bold">أ. علا محسن السيد</span>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           UTILITY FUNCTIONS: DIGIT CONVERSIONS & RTL MATH FORMATTING
+           ========================================================================== */
+        
+        // Convert any English digits (0-9) in text to Eastern Arabic Numerals (٠-٩)
+        function toArabicDigits(str) {
+            if (str === null || str === undefined) return '';
+            const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return String(str).replace(/[0-9]/g, w => arabicDigits[parseInt(w)]);
+        }
+
+        // Convert Eastern Arabic Numerals or stylized minus signs to standard English format for internal evaluation
+        function normalizeToEnglish(str) {
+            if (!str) return '';
+            const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            let res = String(str).trim();
+            for (let i = 0; i < 10; i++) {
+                res = res.replace(new RegExp(arabicDigits[i], 'g'), i);
+            }
+            // Replace various Unicode minus/dash characters with standard '-'
+            res = res.replace(/[−–—]/g, '-');
+            // Remove + sign or parentheses if any
+            res = res.replace(/\+/g, '').replace(/[\(\)]/g, '');
+            // Handle trailing or leading minus (e.g., "42-" or "-42")
+            if (res.endsWith('-') && !res.startsWith('-')) {
+                res = '-' + res.slice(0, -1);
+            }
+            return res.trim();
+        }
+
+        // Wrap math expressions in strictly isolated RTL containers with Arabic digits
+        function formatMathHTML(mathStr) {
+            let formatted = toArabicDigits(mathStr);
+            return `<span class="math-expr" dir="rtl">${formatted}</span>`;
+        }
+
+        /* ==========================================================================
+           AUDIO SYNTHESIZER (WEB AUDIO API - NO EXTERNAL FILES REQUIRED)
+           ========================================================================== */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            const text = document.getElementById('sound-text');
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up text-amber-400';
+                text.innerText = 'الصوت';
+                playSound('click');
+            } else {
+                icon.className = 'fas fa-volume-mute text-slate-500';
+                text.innerText = 'كتم';
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'tick') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(350, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.03);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.03);
+                } else if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.3);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.setValueAtTime(140, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'fanfare') {
+                    const chord = [392.00, 523.25, 659.25, 783.99]; // G4, C5, E5, G5
+                    chord.forEach((freq) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now);
+                        osc.stop(now + 1.2);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        /* ==========================================================================
+           WHEEL CATEGORIES & QUESTION BANK DATA
+           ========================================================================== */
+        const CATEGORIES = [
+            { id: 0, name: 'تحدي الضرب', color: '#EF4444', icon: '🔴' },
+            { id: 1, name: 'تحدي القسمة', color: '#3B82F6', icon: '🔵' },
+            { id: 2, name: 'تحدي الإشارة', color: '#10B981', icon: '🟢' },
+            { id: 3, name: 'العدد المفقود', color: '#F59E0B', icon: '🟡' },
+            { id: 4, name: 'صح أم خطأ', color: '#8B5CF6', icon: '🟣' },
+            { id: 5, name: 'التحدي الذهبي', color: '#F97316', icon: '🟠' }
+        ];
+
+        // Exact 20 Question Bank formatted with signs strictly on the right (RTL Arabized Math Notation)
+        const ALL_QUESTIONS = [
+            // Category 1: تحدي الضرب (catId: 0)
+            { id: 1, catId: 0, text: '(−٨) × (−٣) = ؟', type: 'num', ans: '24' },
+            { id: 2, catId: 0, text: '(−٧) × (+٦) = ؟', type: 'num', ans: '-42' },
+            { id: 3, catId: 0, text: '(+٩) × (+٤) = ؟', type: 'num', ans: '36' },
+            { id: 4, catId: 0, text: '(+٥) × (−٢) = ؟', type: 'num', ans: '-10' },
+
+            // Category 2: تحدي القسمة (catId: 1)
+            { id: 5, catId: 1, text: '(−٣٦) ÷ (+٦) = ؟', type: 'num', ans: '-6' },
+            { id: 6, catId: 1, text: '(+٤٨) ÷ (−٨) = ؟', type: 'num', ans: '-6' },
+            { id: 7, catId: 1, text: '(−٥٤) ÷ (−٩) = ؟', type: 'num', ans: '6' },
+            { id: 8, catId: 1, text: '(−٢٠) ÷ (+٤) = ؟', type: 'num', ans: '-5' },
+
+            // Category 3: تحدي الإشارة (catId: 2)
+            { id: 9, catId: 2, text: 'عند ضرب عددين مختلفين في الإشارة يكون الناتج عددًا ............', type: 'text', ans: ['سالبة', 'سالب'] },
+            { id: 10, catId: 2, text: 'عند قسمة عددين مختلفين في الإشارة يكون الناتج عددًا ............', type: 'text', ans: ['سالبة', 'سالب'] },
+            { id: 11, catId: 2, text: 'عند ضرب عددين متشابهين في الإشارة يكون الناتج عددًا ............', type: 'text', ans: ['موجبة', 'موجب'] },
+            { id: 12, catId: 2, text: 'عند قسمة عددين متشابهين في الإشارة يكون الناتج عددًا ............', type: 'text', ans: ['موجبة', 'موجب'] },
+
+            // Category 4: العدد المفقود (catId: 3)
+            { id: 13, catId: 3, text: '(−٦) × □ = (+٤٢)', type: 'num', ans: '-7' },
+            { id: 14, catId: 3, text: '□ ÷ (−٥) = (+٦)', type: 'num', ans: '-30' },
+            { id: 15, catId: 3, text: '□ × (−٥) = (+٥٥)', type: 'num', ans: '-11' },
+
+            // Category 5: صح أم خطأ (catId: 4)
+            { id: 16, catId: 4, text: '(−٤) × (+٣) = +١٢', type: 'tf', ans: ['خطأ', 'خاطئة', 'خطا'], extra: 'أحسنت! لأن الناتج الصحيح هو −١٢.' },
+            { id: 17, catId: 4, text: '(−٢٤) ÷ (−٦) = +٤', type: 'tf', ans: ['صحيح', 'صح', 'صواب'], extra: 'أحسنت! الإجابة صحيحة.' },
+
+            // Category 6: التحدي الذهبي (catId: 5)
+            { id: 18, catId: 5, text: '(−١٢) × (+٥) = ؟', type: 'num', ans: '-60' },
+            { id: 19, catId: 5, text: '(+٧٢) ÷ (−٩) = ؟', type: 'num', ans: '-8' },
+            { id: 20, catId: 5, text: '٠ ÷ (−٧) = ؟', type: 'num', ans: '0' }
+        ];
+
+        /* ==========================================================================
+           GAME STATE MANAGEMENT
+           ========================================================================== */
+        let studentName = '';
+        let currentScore = 0;
+        let askedQuestionIds = [];
+        let currentQuestion = null;
+        let currentAttempt = 1; // 1 or 2
+        let firstTryCount = 0;
+        let secondTryCount = 0;
+        let isSpinning = false;
+        let currentAngle = 0; // in radians
+
+        /* ==========================================================================
+           INTERACTIVE HTML5 CANVAS WHEEL DRAWING & ROTATION
+           ========================================================================== */
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        const numSlices = CATEGORIES.length;
+        const sliceAngle = (2 * Math.PI) / numSlices;
+
+        function drawWheel() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = width / 2 - 12;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw Wheel Segments
+            for (let i = 0; i < numSlices; i++) {
+                const angleStart = currentAngle + i * sliceAngle;
+                const angleEnd = angleStart + sliceAngle;
+
+                // Slice sector
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angleStart, angleEnd);
+                ctx.closePath();
+                ctx.fillStyle = CATEGORIES[i].color;
+                ctx.fill();
+
+                // Slice border line
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#0f172a';
+                ctx.stroke();
+
+                // Text Label & Icon Rendering inside segment
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angleStart + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 18px Tajawal, sans-serif';
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 4;
+                
+                // Text label
+                ctx.fillText(CATEGORIES[i].name, radius - 25, 6);
+                
+                // Icon
+                ctx.font = '20px sans-serif';
+                ctx.fillText(CATEGORIES[i].icon, radius - 130, 7);
+
+                ctx.restore();
+            }
+
+            // Outer Metallic Ring
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#F59E0B'; // Amber rim
+            ctx.stroke();
+
+            // Outer Pins/Pegs
+            for (let i = 0; i < numSlices; i++) {
+                const pinAngle = currentAngle + i * sliceAngle;
+                const px = centerX + (radius - 5) * Math.cos(pinAngle);
+                const py = centerY + (radius - 5) * Math.sin(pinAngle);
+
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            initAudio();
+            playSound('click');
+
+            // 1. Determine available questions that haven't been asked yet
+            const unaskedQuestions = ALL_QUESTIONS.filter(q => !askedQuestionIds.includes(q.id));
+            if (unaskedQuestions.length === 0) {
+                endGame();
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('spin-btn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            // 2. Choose a question from remaining unasked questions
+            const selectedQ = unaskedQuestions[Math.floor(Math.random() * unaskedQuestions.length)];
+            currentQuestion = selectedQ;
+
+            // 3. Find the category index for this question
+            const targetCatIndex = selectedQ.catId;
+
+            // 4. Calculate exact angle to stop pointer (Pointer is at TOP: 1.5 * Math.PI or 270 deg)
+            const targetSegmentCenterAngle = (targetCatIndex + 0.5) * sliceAngle;
+            const pointerAngle = 1.5 * Math.PI;
+            
+            // Total rotations (5 to 8 full revolutions)
+            const fullSpins = 5 + Math.floor(Math.random() * 3);
+            
+            // Final target rotation angle
+            let targetAngle = pointerAngle - targetSegmentCenterAngle + (fullSpins * 2 * Math.PI);
+            
+            // Add randomized offset within slice center to look natural
+            const randomSliceOffset = (Math.random() - 0.5) * (sliceAngle * 0.6);
+            targetAngle += randomSliceOffset;
+
+            // 5. Animation Physics
+            const startAngle = currentAngle;
+            const totalRotationChange = targetAngle - (startAngle % (2 * Math.PI));
+            const duration = 3500; // 3.5 seconds
+            const startTime = performance.now();
+            let lastTickSegment = -1;
+
+            const pointerElem = document.getElementById('wheel-pointer');
+
+            function animateSpin(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease-out cubic easing function
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                currentAngle = startAngle + totalRotationChange * easeOut;
+
+                // Sound tick calculation when passing pins
+                const normalizedAngle = (currentAngle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                const currentSegmentUnderPointer = Math.floor(((pointerAngle - normalizedAngle + 2 * Math.PI) % (2 * Math.PI)) / sliceAngle);
+
+                if (currentSegmentUnderPointer !== lastTickSegment) {
+                    playSound('tick');
+                    pointerElem.classList.add('pointer-ticking');
+                    setTimeout(() => pointerElem.classList.remove('pointer-ticking'), 100);
+                    lastTickSegment = currentSegmentUnderPointer;
+                }
+
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('spin-btn').disabled = false;
+                    document.getElementById('spin-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Wheel stopped! Open Question Modal
+                    setTimeout(() => {
+                        openQuestionModal();
+                    }, 400);
+                }
+            }
+
+            requestAnimationFrame(animateSpin);
+        }
+
+        /* ==========================================================================
+           GAME FLOW CONTROLLER
+           ========================================================================== */
+        function startGame(e) {
+            if (e) e.preventDefault();
+            initAudio();
+            
+            const nameInput = document.getElementById('student-name-input').value.trim();
+            if (!nameInput) return;
+
+            studentName = nameInput;
+            currentScore = 0;
+            askedQuestionIds = [];
+            firstTryCount = 0;
+            secondTryCount = 0;
+
+            document.getElementById('student-greeting').innerText = `البطل: ${studentName}`;
+            updateScoreUI();
+
+            // Screen switch
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            // Draw initial wheel
+            currentAngle = 0;
+            drawWheel();
+            playSound('click');
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score-display').innerText = toArabicDigits(currentScore);
+            
+            const qNum = askedQuestionIds.length + 1;
+            const totalQ = 20;
+            document.getElementById('question-progress-text').innerText = `السؤال ${toArabicDigits(Math.min(qNum, totalQ))} من ${toArabicDigits(totalQ)}`;
+            
+            const percent = ((qNum - 1) / totalQ) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+        }
+
+        function openQuestionModal() {
+            if (!currentQuestion) return;
+
+            currentAttempt = 1;
+            const category = CATEGORIES[currentQuestion.catId];
+
+            // Setup Badge
+            const badge = document.getElementById('cat-badge');
+            badge.style.backgroundColor = category.color;
+            document.getElementById('cat-badge-icon').innerText = category.icon;
+            document.getElementById('cat-badge-text').innerText = category.name;
+
+            // Setup Attempt Badge
+            document.getElementById('attempt-badge').innerText = 'المحاولة الأولى (🏆 +١٠ نقاط)';
+            document.getElementById('attempt-badge').className = 'text-xs font-bold px-3 py-1 bg-amber-950/60 text-amber-300 rounded-lg border border-amber-500/40';
+
+            // Setup Question Text
+            const textContainer = document.getElementById('question-text-container');
+            textContainer.innerHTML = formatMathHTML(currentQuestion.text);
+
+            // Reset Input & Feedback
+            const answerInput = document.getElementById('answer-input');
+            answerInput.value = '';
+            answerInput.disabled = false;
+            
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.className = 'hidden p-3 rounded-2xl text-center text-xs sm:text-sm font-bold transition-all';
+            feedbackBox.innerHTML = '';
+
+            // Toggle Buttons
+            document.getElementById('submit-btn').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            // Show Modal with smooth animation
+            const modal = document.getElementById('question-modal');
+            const card = document.getElementById('question-modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.add('modal-active');
+                answerInput.focus();
+            }, 50);
+        }
+
+        function submitAnswer(e) {
+            if (e) e.preventDefault();
+            const rawUserVal = document.getElementById('answer-input').value;
+            if (!rawUserVal || rawUserVal.trim() === '') return;
+
+            const normalizedUser = normalizeToEnglish(rawUserVal).toLowerCase().trim();
+            let isCorrect = false;
+
+            if (currentQuestion.type === 'num') {
+                const targetNum = normalizeToEnglish(currentQuestion.ans);
+                isCorrect = (normalizedUser === targetNum);
+            } else if (currentQuestion.type === 'text' || currentQuestion.type === 'tf') {
+                const targets = Array.isArray(currentQuestion.ans) ? currentQuestion.ans : [currentQuestion.ans];
+                isCorrect = targets.some(target => {
+                    const normT = normalizeToEnglish(target).toLowerCase().trim();
+                    return normalizedUser === normT;
+                });
+            }
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                // Correct Answer Logic
+                playSound('correct');
+                
+                let pts = 0;
+                if (currentAttempt === 1) {
+                    pts = 10;
+                    firstTryCount++;
+                    feedbackBox.className = 'p-3 rounded-2xl text-center text-sm font-bold bg-emerald-950/80 border border-emerald-500/50 text-emerald-300';
+                    feedbackBox.innerHTML = `🎉 أحسنت يا ${studentName}! 👏<br>إجابة صحيحة ممتازة (+١٠ نقاط)`;
+                } else {
+                    pts = 5;
+                    secondTryCount++;
+                    feedbackBox.className = 'p-3 rounded-2xl text-center text-sm font-bold bg-sky-950/80 border border-sky-500/50 text-sky-300';
+                    feedbackBox.innerHTML = `👏 أحسنت يا ${studentName}! <br>لقد وصلت إلى الإجابة الصحيحة (+٥ نقاط)`;
+                }
+
+                if (currentQuestion.extra) {
+                    feedbackBox.innerHTML += `<br><span class="text-xs text-amber-300 mt-1 block">${currentQuestion.extra}</span>`;
+                }
+
+                currentScore += pts;
+                updateScoreUI();
+                triggerConfetti();
+
+                // Lock input & show next button
+                document.getElementById('answer-input').disabled = true;
+                document.getElementById('submit-btn').classList.add('hidden');
+                document.getElementById('next-btn').classList.remove('hidden');
+                document.getElementById('next-btn').focus();
+
+            } else {
+                // Wrong Answer Logic
+                playSound('wrong');
+
+                if (currentAttempt === 1) {
+                    // Give Second Attempt
+                    currentAttempt = 2;
+                    feedbackBox.className = 'p-3 rounded-2xl text-center text-sm font-bold bg-rose-950/80 border border-rose-500/50 text-rose-300 animate-bounce';
+                    feedbackBox.innerHTML = `❌ حاول مرة أخرى يا بطل! (المحاولة الثانية: ⭐ +٥ نقاط)`;
+
+                    document.getElementById('attempt-badge').innerText = 'المحاولة الثانية (⭐ +٥ نقاط)';
+                    document.getElementById('attempt-badge').className = 'text-xs font-bold px-3 py-1 bg-sky-950/60 text-sky-300 rounded-lg border border-sky-500/40';
+                    
+                    document.getElementById('answer-input').value = '';
+                    document.getElementById('answer-input').focus();
+
+                } else {
+                    // Failed both attempts
+                    feedbackBox.className = 'p-3 rounded-2xl text-center text-sm font-bold bg-slate-800 border border-slate-600 text-slate-300';
+                    
+                    let displayAns = currentQuestion.ans;
+                    if (Array.isArray(displayAns)) displayAns = displayAns[0];
+                    let formattedDisplay = formatMathHTML(displayAns);
+
+                    feedbackBox.innerHTML = `لا بأس يا بطل! حاول في الأسئلة القادمة.<br>الإجابة الصحيحة كانت: <span class="text-amber-400 font-bold">${formattedDisplay}</span>`;
+                    
+                    if (currentQuestion.extra) {
+                        feedbackBox.innerHTML += `<br><span class="text-xs text-amber-300 mt-1 block">${formatMathHTML(currentQuestion.extra)}</span>`;
+                    }
+
+                    document.getElementById('answer-input').disabled = true;
+                    document.getElementById('submit-btn').classList.add('hidden');
+                    document.getElementById('next-btn').classList.remove('hidden');
+                    document.getElementById('next-btn').focus();
+                }
+            }
+        }
+
+        function closeQuestionModalAndContinue() {
+            playSound('click');
+            
+            // Mark question as asked
+            if (currentQuestion && !askedQuestionIds.includes(currentQuestion.id)) {
+                askedQuestionIds.push(currentQuestion.id);
+            }
+
+            // Close Modal
+            const modal = document.getElementById('question-modal');
+            const card = document.getElementById('question-modal-card');
+            modal.classList.add('opacity-0');
+            card.classList.remove('modal-active');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                updateScoreUI();
+
+                // Check if 20 questions are completed
+                if (askedQuestionIds.length >= 20) {
+                    endGame();
+                }
+            }, 300);
+        }
+
+        /* ==========================================================================
+           END GAME & CERTIFICATE CONTROLLER
+           ========================================================================== */
+        function endGame() {
+            playSound('fanfare');
+            triggerConfetti();
+
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            document.getElementById('res-student-name').innerText = studentName;
+            document.getElementById('res-total-score').innerText = toArabicDigits(currentScore);
+            document.getElementById('res-first-try').innerText = toArabicDigits(firstTryCount);
+            document.getElementById('res-second-try').innerText = toArabicDigits(secondTryCount);
+
+            // Dynamic Performance Appraisal
+            const appraisalElem = document.getElementById('res-appraisal');
+            if (currentScore >= 180) {
+                appraisalElem.innerHTML = `🌟 أداء أسطوري ورائع جدًا!<br>أثبتَّ أنك بطل متفوق في ضرب وقسمة الأعداد الصحيحة! 🏆`;
+            } else if (currentScore >= 120) {
+                appraisalElem.innerHTML = `👏 أداء ممتاز وتفوق ملحوظ!<br>واصل إبداعك يا بطل في مادة الرياضيات! ⭐`;
+            } else {
+                appraisalElem.innerHTML = `👍 محاولة جيدة وطيبة!<br>استمر في التدريب وستصبح أفضل بطل في الأعداد الصحيحة! 💪`;
+            }
+        }
+
+        function showCertificateModal() {
+            playSound('click');
+            document.getElementById('cert-student-name').innerText = studentName;
+            document.getElementById('cert-score').innerText = toArabicDigits(currentScore);
+            
+            // Today's Date formatted in Arabic Digits
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+            document.getElementById('cert-date').innerText = toArabicDigits(dateStr);
+
+            const certModal = document.getElementById('certificate-modal');
+            certModal.classList.remove('hidden');
+            setTimeout(() => {
+                certModal.classList.remove('opacity-0');
+            }, 50);
+        }
+
+        function closeCertificateModal() {
+            playSound('click');
+            const certModal = document.getElementById('certificate-modal');
+            certModal.classList.add('opacity-0');
+            setTimeout(() => {
+                certModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function restartGame() {
+            playSound('click');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            document.getElementById('student-name-input').value = '';
+        }
+
+        /* ==========================================================================
+           CANVAS CONFETTI PARTICLE ANIMATION ENGINE
+           ========================================================================== */
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const cCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimationId = null;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        function triggerConfetti() {
+            confettiParticles = [];
+            const colors = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#FACC15'];
+            
+            for (let i = 0; i < 90; i++) {
+                confettiParticles.push({
+                    x: confettiCanvas.width / 2,
+                    y: confettiCanvas.height / 2,
+                    vx: (Math.random() - 0.5) * 18,
+                    vy: (Math.random() - 0.7) * 18,
+                    size: Math.random() * 8 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10,
+                    life: 1,
+                    decay: Math.random() * 0.015 + 0.015
+                });
+            }
+
+            if (!confettiAnimationId) {
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.35; // gravity
+                p.rotation += p.vRot;
+                p.life -= p.decay;
+
+                if (p.life <= 0) {
+                    confettiParticles.splice(i, 1);
+                    continue;
+                }
+
+                cCtx.save();
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate((p.rotation * Math.PI) / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.globalAlpha = p.life;
+                cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                cCtx.restore();
+            }
+
+            if (confettiParticles.length > 0) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            } else {
+                confettiAnimationId = null;
+                cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }
+        }
+
+        // Initialize Canvas Wheel layout on page render
+        window.addEventListener('load', () => {
+            drawWheel();
+        });
+    </script>
+</body>
+</html>
